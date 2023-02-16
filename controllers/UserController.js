@@ -8,10 +8,10 @@ class UserController{
     }
 
     onSubmit(){
-       
+       //Take the the click on Submit button
         this.formEl.addEventListener("submit", (event)=>{
             
-            event.preventDefault();
+            event.preventDefault();//Stop page refresh.
 
             let values = this.getValues();
 
@@ -32,9 +32,9 @@ class UserController{
     getPhoto(){
 
         return new Promise((resolve, reject)=>{
-            let fileReader = new FileReader();
+            let fileReader = new FileReader(); //Create a instance of class FileReader.
             let elements = [...this.formEl.elements].filter(item=>{
-                if(item.name === 'photo'){
+                if(item.name === 'photo'){//Take photo field element.
                     return item;
                 }
             });
@@ -49,10 +49,10 @@ class UserController{
                 reject(e);
             }
             if(file){
-                fileReader.readAsDataURL(file);
+                fileReader.readAsDataURL(file);//Return URL of file.
             }
             else{
-                resolve('dist/img/boxed-bg.jpg');
+                resolve('dist/img/boxed-bg.jpg');//If file is'nt set, return a default image.
             }
         });
         
@@ -60,11 +60,11 @@ class UserController{
 
 
     getValues(){
-
+        //This method is used to get values of Form Fields
         let user = {};
-        [...this.formEl.elements].forEach(function(field, index){
+        [...this.formEl.elements].forEach(function(field){
 
-            if(field.name == 'gender' && field.checked){
+            if(field.name == 'gender' && field.checked){//Analise which field gender are checked (there's two field gender's)
                 user[field.name] = field.value;
             }
             else if(field.name == "admin"){
@@ -79,7 +79,7 @@ class UserController{
             }
         });
     
-        var objectUser = new User(
+        var objectUser = new User( //Create a instance of User Obj
             user.name,
             user.gender,
             user.birth,
@@ -93,7 +93,7 @@ class UserController{
     }
 
     addLine(dataUser){
-        let tr = document.createElement("tr");
+        let tr = document.createElement("tr"); //Create a new row
         tr.innerHTML = `
         <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
         <td>${dataUser.name}</td>
@@ -104,7 +104,7 @@ class UserController{
           <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
           <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
         </td>
-        `
-        this.TableEl.appendChild(tr);
+        `//Edit row with dataUser properties
+        this.TableEl.appendChild(tr);// Append the new row inside tbody
     }
 }
