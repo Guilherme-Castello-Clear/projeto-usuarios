@@ -2,7 +2,7 @@ class UserController{
     constructor(formId, tableId){
 
         this.formEl = document.getElementById(formId);
-        this.TableEl = document.getElementById(tableId);
+        this.tableEl = document.getElementById(tableId);
         this.onSubmit();
 
     }
@@ -18,7 +18,10 @@ class UserController{
             btn.disabled = true;
 
             let values = this.getValues();
-
+            if(!values){
+                btn.disabled = false;
+                return false;
+            } 
             this.getPhoto().then(
                 (content)=>{
                     values.photo = content;
@@ -30,6 +33,8 @@ class UserController{
                 },
                 (e)=>{
                     console.error(e);
+                    
+
             });
             
         });
@@ -69,7 +74,15 @@ class UserController{
     getValues(){
         //This method is used to get values of Form Fields
         let user = {};
+        let isValid = true;
         [...this.formEl.elements].forEach(function(field){
+
+
+            if(['name', 'email', "password"].indexOf(field.name) > -1 && !field.value){
+                field.parentElement.classList.add("has-error");
+                isValid = false;
+                return false;
+            }
 
             if(field.name == 'gender' && field.checked){//Analise which field gender are checked (there's two field gender's)
                 user[field.name] = field.value;
@@ -86,6 +99,9 @@ class UserController{
             }
         });
     
+        if(!isValid){
+            return false;
+        }
         var objectUser = new User( //Create a instance of User Obj
             user.name,
             user.gender,
@@ -101,6 +117,7 @@ class UserController{
 
     addLine(dataUser){
         let tr = document.createElement("tr"); //Create a new row
+        tr.dataset.user = JSON.stringify(dataUser);
         tr.innerHTML = `
         <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
         <td>${dataUser.name}</td>
@@ -112,6 +129,25 @@ class UserController{
           <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
         </td>
         `//Edit row with dataUser properties
-        this.TableEl.appendChild(tr);// Append the new row inside tbody
+        this.tableEl.appendChild(tr);// Append the new row inside tbody
+        this.updateCount()
+ 
+ 
+    }
+
+    updateCount(){
+        let numberUsers = 0;
+        let numberAdmin = 0;
+        [...this.tableEl.children].forEach(tr=>{
+            numberUsers++;
+            let user = JSON.parse(tr.dataset.user);
+
+            if (user._admin) numberAdmin++;
+        });
+
+        document.getElementById("number-users").innerHTML = numberUsers;
+        document.getElementById("number-users-admin").innerHTML = numberAdmin;
+
+
     }
 }
