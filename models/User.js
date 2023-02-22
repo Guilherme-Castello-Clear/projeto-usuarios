@@ -110,21 +110,28 @@ class User{
 
     }
     getNewID(){
+        if(localStorage.getItem("usersID")){
+            console.log("First IF")
 
-        if(window.id == null){
-            window.id = 1;
-
+            var usersID = parseInt(localStorage.getItem("usersID"));
         }
         else{
-            window.id++;
+            localStorage.setItem("usersID", 1);
+            var usersID = parseInt(localStorage.getItem("usersID"));
+            console.log("First Else")
+        }
+        console.log(usersID);
+        if(usersID < 1){
+            usersID = 1;
+            localStorage.setItem("usersID", usersID);
+        }
+        else{
 
-
+            usersID++;
+            localStorage.setItem("usersID", usersID);
         }
         
-        return window.id;
-
-
-
+        return usersID;
     }
     save(){
 
@@ -149,6 +156,19 @@ class User{
         }
         localStorage.setItem("users", JSON.stringify(users));
         
+
+    }
+
+    remove(){
+
+        let users = User.getUsersStorage();
+        users.forEach((userData, index)=>{
+
+            if(this._id == userData._id){
+                users.splice(index, 1);
+            }
+            localStorage.setItem("users", JSON.stringify(users));
+        })
 
     }
 }
