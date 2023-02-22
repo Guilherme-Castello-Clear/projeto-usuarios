@@ -17,10 +17,10 @@ class UserController{
         [...this.tableEl.children].forEach(tr=>{
             numberUsers++;
             let user = JSON.parse(tr.dataset.user);
-            document.getElementById("number-users").innetHTML = numberUsers;
+            document.getElementById("number-users").innerHTML = numberUsers;
             if (user._admin){
                 numberAdmin++
-                document.getElementById("number-users-admin").innetHTML = numberAdmin;
+                document.getElementById("number-users-admin").innerHTML = numberAdmin;
             } 
         });
     }
@@ -52,20 +52,9 @@ class UserController{
                     } else { 
                         result._photo = content;
                     }
-                    tr.dataset.user = JSON.stringify(result);
-
-                    tr.innerHTML = `
-                        <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                        <td>${result._name}</td>
-                        <td>${result._email}</td>
-                        <td>${(result._admin) ? 'Sim' : "Não"}</td>
-                        <td>${Utils.dateFormat(result._register)}</td>
-                        <td>
-                        <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                        <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-                        </td>
-                    `
-                    this.addEventsTr(tr);
+                    let user = new User()
+                    user.loadFromJSON(result);
+                    tr = this.getTr(user, tr);
                     this.updateCount();
                     this.formUpdateEl.reset();
                     btn.disabled = false;
@@ -193,9 +182,9 @@ class UserController{
     getUsersStorage(){
 
         let users = [];
-        if(sessionStorage.getItem("users")){
+        if(localStorage.getItem("users")){
 
-            let users = JSON.parse(sessionStorage.getItem("users"));
+            let users = JSON.parse(localStorage.getItem("users"));
 
             return users;
 
@@ -224,19 +213,16 @@ class UserController{
         let users = this.getUsersStorage();        
         users.push(data);
 
+        //sessionStorage.setItem("users", JSON.stringify(users));
 
-        sessionStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("users", JSON.stringify(users));
 
 
 
     }
 
-    addLine(dataUser){
-        let tr = document.createElement("tr"); //Create a new row
-        
-        
-        
-        
+    getTr(dataUser, tr = null){
+        if(tr === null) tr = document.createElement("tr"); //Create a new row
         tr.dataset.user = JSON.stringify(dataUser);
 
         tr.innerHTML = `
@@ -249,10 +235,18 @@ class UserController{
           <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
           <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
         </td>
-        `//Edit row with dataUser properties
-
+        `;
         this.addEventsTr(tr);
+        return tr;
+    }
+
+
+    addLine(dataUser){
+        
+        let tr = this.getTr(dataUser);        
+        
         this.tableEl.appendChild(tr);// Append the new row inside tbody
+        
         this.updateCount()
  
  
