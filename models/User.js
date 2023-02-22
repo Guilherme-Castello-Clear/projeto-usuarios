@@ -2,6 +2,7 @@ class User{
 
     constructor(name, gender, birth, country, email, password, photo, admin){
         //Define User Object Attributes
+        this._id;
         this._name = name;
         this._gender = gender;
         this._birth = birth;
@@ -12,6 +13,10 @@ class User{
         this._admin = admin;
         this._register = new Date();
 
+    }
+
+    get id(){
+        return this._id;
     }
 
     get register(){
@@ -86,7 +91,64 @@ class User{
             default:
                 this[name] = json[name];
             }
+
         }
+
     }
 
+    static getUsersStorage(){
+
+        let users = [];
+        if(localStorage.getItem("users")){
+
+            let users = JSON.parse(localStorage.getItem("users"));
+            return users;
+
+
+        }
+        return users;
+
+    }
+    getNewID(){
+
+        if(window.id == null){
+            window.id = 1;
+
+        }
+        else{
+            window.id++;
+
+
+        }
+        
+        return window.id;
+
+
+
+    }
+    save(){
+
+        let users = User.getUsersStorage();
+        console.log(this.id);    
+        if(this.id > 0){
+            console.log("In If")
+            users.map(u=>{
+                if (u._id == this.id){
+                    Object.assign(u, this);
+                }
+                return u;
+            }) 
+        }
+        else{
+            console.log("In Else")
+                 
+
+            this._id = this.getNewID();
+
+            users.push(this);
+        }
+        localStorage.setItem("users", JSON.stringify(users));
+        
+
+    }
 }
