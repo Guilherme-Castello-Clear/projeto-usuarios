@@ -111,16 +111,13 @@ class User{
     }
     getNewID(){
         if(localStorage.getItem("usersID")){
-            console.log("First IF")
 
             var usersID = parseInt(localStorage.getItem("usersID"));
         }
         else{
             localStorage.setItem("usersID", 1);
             var usersID = parseInt(localStorage.getItem("usersID"));
-            console.log("First Else")
         }
-        console.log(usersID);
         if(usersID < 1){
             usersID = 1;
             localStorage.setItem("usersID", usersID);
@@ -136,9 +133,7 @@ class User{
     save(){
 
         let users = User.getUsersStorage();
-        console.log(this.id);    
         if(this.id > 0){
-            console.log("In If")
             users.map(u=>{
                 if (u._id == this.id){
                     Object.assign(u, this);
@@ -147,11 +142,9 @@ class User{
             }) 
         }
         else{
-            console.log("In Else")
                  
 
             this._id = this.getNewID();
-
             users.push(this);
         }
         localStorage.setItem("users", JSON.stringify(users));
