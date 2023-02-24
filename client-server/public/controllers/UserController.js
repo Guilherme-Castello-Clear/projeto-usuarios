@@ -182,15 +182,33 @@ class UserController{
 
     selectAll(){
 
-        let users = User.getUsersStorage();  
+        //let users = User.getUsersStorage();  
 
-        users.forEach(dataUser=>{
+        let obj = {users : []};
 
-            let user = new User();
-            user.loadFromJSON(dataUser)
-            this.addLine(user);
+        try{
+            var ajax = new XMLHttpRequest();
+        }
+        catch(e){
+            console.error(e);
+        }
+        ajax.open('GET', '/users');
+        ajax.onload = event => {
+            let obj = JSON.parse(ajax.responseText);
+            obj.users
 
-        })
+            obj.users.forEach(dataUser=>{
+
+                let user = new User();
+                user.loadFromJSON(dataUser)
+                this.addLine(user);
+    
+            })
+
+        }
+        ajax.send();
+
+        
 
     }
 

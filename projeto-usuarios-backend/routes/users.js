@@ -33,8 +33,8 @@ module.exports = (app)=>{
     
     route.post([
     
-            check('name', 'O nome é obrigatório.').notEmpty(),
-            check('email', 'O email é inválido.').notEmpty().isEmail(),
+            check('_name', 'O nome é obrigatório.').notEmpty(),
+            check('_email', 'O email é inválido.').notEmpty().isEmail(),
         ],
         (req, res) => {
             let errors = validationResult(req);
