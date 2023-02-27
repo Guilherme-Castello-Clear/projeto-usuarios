@@ -183,7 +183,7 @@ class UserController{
 
     selectAll(){
 
-        HttpRequest.get('/users').then(data => {
+        User.getUsersStorage().then(data => {
 
             data.users.forEach(dataUser=>{
 
@@ -233,9 +233,11 @@ class UserController{
             if(confirm("Deseja realmente exluir?")){
                 let user = new User();
                 user.loadFromJSON(JSON.parse(tr.dataset.user));
-                user.remove();
-                tr.remove();
+                user.remove().then(data=>{
+                    tr.remove();
+                });
                 this.updateCount();
+                
             }
 
         });
