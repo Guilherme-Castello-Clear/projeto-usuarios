@@ -22,6 +22,7 @@ class User{
     get register(){
         return this._register;
     }
+
     get name(){
         return this._name
     }
@@ -51,45 +52,21 @@ class User{
 
     //
 
-    set register(value){
-        return this._register;
-    }
-    set name(value){
-        return this._name
-    }
-
-    set gender(value){
-        return this._gender
-    }
-    set birth(value){
-        return this._birth
-    }
-    set country(value){
-        return this._country
-    }
-    set email(value){
-        return this._email
-    }
-    set password(value){
-        return this._password
-    }
     set photo(value){
         this._photo = value;
     }
-    set admin(value){
-        return this._admin
-    }
-    
+
 
     loadFromJSON(json){
 
         for(let name in json){
             switch(name){
-                case `_register`:
+                case '_register':
                     this[name] = new Date(json[name]);
                     break;
             default:
-                this[name] = json[name];
+                if(name.substring(0, 1) === '_') this[name] = json[name];
+                break;
             }
 
         }
@@ -99,56 +76,73 @@ class User{
     static getUsersStorage(){
 
         let users = [];
-        if(localStorage.getItem("users")){
 
-            let users = JSON.parse(localStorage.getItem("users"));
-            return users;
+        if (localStorage.getItem("users")) {
 
+            users = JSON.parse(localStorage.getItem("users"));
 
         }
+
         return users;
 
     }
+
     getNewID(){
-        if(localStorage.getItem("usersID")){
 
-            var usersID = parseInt(localStorage.getItem("usersID"));
-        }
-        else{
-            localStorage.setItem("usersID", 1);
-            var usersID = parseInt(localStorage.getItem("usersID"));
-        }
-        if(usersID < 1){
-            usersID = 1;
-            localStorage.setItem("usersID", usersID);
-        }
-        else{
+        let usersID = parseInt(localStorage.getItem("usersID"));
 
-            usersID++;
-            localStorage.setItem("usersID", usersID);
-        }
-        
+        if (!usersID > 0) usersID = 0;
+
+        usersID++;
+
+        localStorage.setItem("usersID", usersID);
+
         return usersID;
+
     }
+
+    toJSON(){
+
+        let json = {}
+
+        Object.keys(this).forEach(key => {
+
+            if (this[key] !== undefined) json[key] = this[key];
+
+        });
+
+        return json;
+
+    }
+
     save(){
+        return new Promise((resolve, reject) =>{
 
-        let users = User.getUsersStorage();
-        if(this.id > 0){
-            users.map(u=>{
-                if (u._id == this.id){
-                    Object.assign(u, this);
-                }
-                return u;
-            }) 
-        }
-        else{
-                 
+            let promise;
 
-            this._id = this.getNewID();
-            users.push(this);
-        }
-        localStorage.setItem("users", JSON.stringify(users));
-        
+            if (this.id){
+
+                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON())
+    
+            }
+            else{         
+                console.log(this.id);
+
+                promise = HttpRequest.post(`/users/`, this.toJSON());
+            
+            }
+
+            promise.then(data =>{
+    
+                this.loadFromJSON(data);
+
+                resolve(this);
+
+            }).catch(e=>{
+
+                reject(e);
+            });
+        });
 
     }
 
@@ -160,8 +154,8 @@ class User{
             if(this._id == userData._id){
                 users.splice(index, 1);
             }
-            localStorage.setItem("users", JSON.stringify(users));
         })
+        localStorage.setItem("users", JSON.stringify(users));
 
     }
 }

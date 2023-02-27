@@ -54,12 +54,14 @@ class UserController{
                     }
                     let user = new User()
                     user.loadFromJSON(result);
-                    user.save();
-                    tr = this.getTr(user, tr);
-                    this.updateCount();
-                    this.formUpdateEl.reset();
-                    btn.disabled = false;
-                    this.showPanelCreate
+                    user.save().then(user => {
+                        tr = this.getTr(user, tr);
+                        this.updateCount();
+                        this.formUpdateEl.reset();
+                        btn.disabled = false;
+                        this.showPanelCreate
+                    });
+                    
 
                 },
                 (e)=>{
@@ -88,12 +90,11 @@ class UserController{
             this.getPhoto(this.formEl).then(
                 (content)=>{
                     values.photo = content;
-                    values.save();
-                    this.addLine(values);
-                    this.formEl.reset();
-                    btn.disabled = false;
-                    
-
+                    values.save().then(user =>{
+                        this.addLine(user);
+                        this.formEl.reset();
+                        btn.disabled = false;
+                    });
                 },
                 (e)=>{
                     console.error(e);
@@ -181,8 +182,6 @@ class UserController{
 
 
     selectAll(){
-
-        //let users = User.getUsersStorage();  
 
         HttpRequest.get('/users').then(data => {
 
